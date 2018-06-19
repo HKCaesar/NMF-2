@@ -2,8 +2,7 @@ import numpy as np
 from copy import deepcopy
 import random
 import matplotlib.pyplot as plt
-import image
-from util import makeRandom
+from util import makeRandom, readTSV
 
 np.set_printoptions(suppress=True)
 
@@ -67,13 +66,16 @@ def nonSmooth(V,q,theta):
 
     return (W,H)
 
-ar = []
-for i in range(1,50):
-    ar.append(image.toArray("faces/"+str(i)+".png"))
+V = readTSV("mutation-counts.tsv")
 
-ar = np.array(ar).transpose()
-answer = multiplicativeUpdate(ar,5)
-W = answer[0].transpose()
+bestF = 10000000
+W,H = 0,0
+for i in range(100):
+    print(i)
+    answer = multiplicativeUpdate(V,5)
+    Wp,Hp = answer
+    if(f(V,Wp,Hp)<bestF):
+        bestF = f(V,Wp,Hp)
+        W,H = Wp,Hp
 print(W)
-for i in range(5):
-    image.writeGrayscale(W[i]*255,"faces/gray_"+str(i+1)+".png")
+print(H)

@@ -10,4 +10,8 @@ def readTSV(name):
 		t.append(list(map(int,f[i].split("\t")[1:])))
 	return np.array(t)
 
-print(readTSV("mutation-counts.tsv"))
+def cosineSimilarity(a,b):
+    top = sum([a.item(i)*b.item(i) for i in range(a.size)])
+    bottom = sum([a.item(i)**2 for i in range(a.size)])**.5
+    bottom*=sum([b.item(i)**2 for i in range(b.size)])**.5
+    return top/bottom
