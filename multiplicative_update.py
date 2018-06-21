@@ -62,8 +62,6 @@ def nonSmooth(V,q,theta):
                                  sum([W[c,k]*SH[k,j] for k in range(q)]) for j in range(n)]))/sum([SH[a,j] for j in range(n)])
                 W[c,a] = W[c,a]/sum([W[j,a] for j in range(p)])
 
-        numTrials+=1
-
     return (W,H)
 
 

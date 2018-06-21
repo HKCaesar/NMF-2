@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 
 def makeRandom(m,n):
     return np.random.rand(m,n)
@@ -15,3 +16,15 @@ def cosineSimilarity(a,b):
     bottom = sum([a.item(i)**2 for i in range(a.size)])**.5
     bottom*=sum([b.item(i)**2 for i in range(b.size)])**.5
     return top/bottom
+
+def hungarian(a,b):
+    similarities = [[cosineSimilarity(a[i],b[j]) for j in range(len(b))] for i in range(len(a))]
+    similarities = np.array(similarities)
+
+    row,col = linear_sum_assignment(-1*similarities)
+    s = sum([similarities[row[i]][col[i]] for i in range(len(row))])
+
+    for i in range(len(row)):
+        s+=similarities[row[i]][col[i]]
+
+    return s/len(row)                

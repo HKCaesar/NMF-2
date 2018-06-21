@@ -1,14 +1,27 @@
 import util
 import multiplicative_update as mu
 import numpy as np
+import plotting
+import matplotlib.pyplot as plt
+import random
 
-V = util.readTSV("data/mutation-counts.tsv")
-W,H = mu.multiplicativeUpdate(V,5)
+V = util.readTSV("data/alexsandrov/breast.txt")
 
-actualH = np.load("data/example-signatures.npy")
+with open("data/alexsandrov/signatures.txt") as f:
+    actualW = f.read().split("\n")[1:]
+    for i in range(len(actualW)):
+        actualW[i] = list(map(float,actualW[i].split("\t")[3:]))
+    actualW = np.array(actualW)
 
-differences = [[util.cosineSimilarity(H[i],actualH[j]) for j in range(len(actualH))] for i in range(len(H))]
-differences = np.array(differences)
+W,H = mu.multiplicativeUpdate(V,27)
 
-print(differences)
-        
+for i in range(1):
+    print(i)
+    WP,HP = mu.nonSmooth(V,27,random.random())
+    if(mu.f(V,WP,HP)<mu.f(V,W,H)):
+        W,H = WP, HP
+
+score = plotting.cosineTable(W.transpose(),actualW.transpose(),showBest=True)
+print(score)
+plt.show()
+
