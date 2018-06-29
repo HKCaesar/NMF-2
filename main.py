@@ -5,23 +5,18 @@ import plotting
 import matplotlib.pyplot as plt
 import random
 
-V = util.readTSV("data/alexsandrov/breast.txt")
+V = util.readTSV("data/classdata/mutation-counts.tsv")
 
-with open("data/alexsandrov/signatures.txt") as f:
-    actualW = f.read().split("\n")[1:]
-    for i in range(len(actualW)):
-        actualW[i] = list(map(float,actualW[i].split("\t")[3:]))
-    actualW = np.array(actualW)
+actualW = np.load("data/classdata/example-signatures.npy")
 
-W,H = mu.multiplicativeUpdate(V,27)
+k = 5
+W,H = mu.multiplicativeUpdate(V,k)
 
 for i in range(1):
-    print(i)
-    WP,HP = mu.nonSmooth(V,27,random.random())
+    WP,HP = mu.nonSmooth(V,k,random.random())
     if(mu.f(V,WP,HP)<mu.f(V,W,H)):
         W,H = WP, HP
 
-score = plotting.cosineTable(W.transpose(),actualW.transpose(),showBest=True)
-print(score)
+score = plotting.cosineTable(H,actualW,showBest=True)
 plt.show()
 
