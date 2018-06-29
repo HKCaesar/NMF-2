@@ -53,6 +53,7 @@ def ard(V,k,a,beta,tau,phi):
     lamb = makeRandom(k,1)
 
     tol = -100000
+    previousTol = 10
 
     averageV = 1/(f*n) * sum([V.item(i) for i in range(f*n)])
 
@@ -65,8 +66,8 @@ def ard(V,k,a,beta,tau,phi):
         lamb[i,0] = pr
 
 
-    while(tol<tau):
-        print(tol)
+    while(abs(tol-previousTol)>tau):
+        previousTol = tol
         top = W.transpose().dot(
             ((W.dot(H))**(beta-2))*V)
 
@@ -97,8 +98,6 @@ def ard(V,k,a,beta,tau,phi):
 
             tol = max(r,abs((r-lamb[i,0])/lamb[i,0]))
             lamb[i,0] = r
-
-        print(tol)
 
     return (W,H)
 
