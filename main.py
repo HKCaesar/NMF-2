@@ -16,16 +16,14 @@ with open("data/alexsandrov/signatures.txt") as f:
         actualW[i] = list(map(float,actualW[i].split("\t")[3:]))
     actualW = np.array(actualW).T
 
-k = 30
-#H = model.fit_transform(V)
-#W = model.components_
+k = 27
+H = model.fit_transform(V)
+W = model.components_
 
 
-W,H = ard.ard(V,k,0,1,10**(-5),1,max_iter=30)
-        
+W,H = ard.ard(V,k,0,1,10**(-5),1,max_iter=300)
 H = util.addZeros(H,actualW.shape[0]-H.shape[0])
 actualW = util.addZeros(actualW,H.shape[0]-actualW.shape[0])
-
 
 score = plotting.cosineTable(H,actualW,showBest=True)
 print(score)

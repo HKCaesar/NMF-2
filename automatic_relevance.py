@@ -45,7 +45,7 @@ def repmat(lamb,a,n):
     return mat
 
 def ard(V,k,a,beta,tau,phi,max_iter=300):
-    EPSILON=10**-10
+    EPSILON=10**-6
     INFINITY = 10000000
     
     #Defining the dimensions of the matrix
@@ -56,10 +56,11 @@ def ard(V,k,a,beta,tau,phi,max_iter=300):
     lambdaList = np.zeros((max_iter,k))
 
     #Add small values of epsilon to prevent divide by zero errors
-    V+=EPSILON
+    V=np.add(V,EPSILON)
 
     meanV = np.sum(V)/(f*n)
-    
+
+    #Why initialize like this?
     W = (makeRandom(f,k)+1)*(meanV**.5/k)
     H = (makeRandom(k,n)+1)*(meanV**.5/k)
     b = np.pi * (a-1)*meanV/(2*k)
@@ -70,42 +71,41 @@ def ard(V,k,a,beta,tau,phi,max_iter=300):
 
 
     iteration = 1
-    while(abs(tol-previousTol)>tau and iteration<=max_iter):
-        top = W.T.dot(W.dot(H)**(beta-2)
+    while(tol>tau and iteration<max_iter):
+        #Update H
+        top = W.T.dot((W.dot(H)**(beta-2)) * V)
+        bottom = W.T.dot(W.dot(H)**(beta-1))
+        bottom+=phi*H/np.tile(np.array([lamb]).T,(1,n))
         
-        previousTol = tol
-        top = W.transpose().dot(
-            ((W.dot(H))**(beta-2))*V)
+        allElements=H>0
+        #Checking for NaN
+        if(((top/bottom)**(e(beta)))[0,0]!=((top/bottom)**(e(beta)))[0,0]):
+            break
+        H[allElements] = H[allElements]*((top/bottom)**e(beta))[allElements]
 
-        bottom = W.transpose().dot(W.dot(H)**(beta-1)) + phi * H/repmat(lamb,1,n)
+        #Update W
+        top = (W.dot(H)**(beta-2)*V).dot(H.T)
+        bottom = (W.dot(H)**(beta-1)).dot(H.T) + phi*W/np.tile(np.array([lamb]),(f,1))
+        allElements=W>0
+        if(((top/bottom)[0,0]**(e(beta)))!=((top/bottom)**(e(beta)))[0,0]):
+            break
+        W[allElements] = W[allElements] * ((top/bottom)**e(beta))[allElements]
 
-        HC = deepcopy(H)
-        for i in range(k):
-            for j in range(n):
-                HC[i,j] = q(i,j,W,H,V,W.dot(H),beta) + phi/lamb[i] * HC[i,j]
+
+        lamb = (np.sum(W**2,axis=0).T/2 + np.sum(H**2,axis=1)/2 + b)/c
+        lambdaList[iteration] = lamb
+        previous = lambdaList[iteration-1]
+        tol = max((lamb-previous)/previous)
+
+        #To avoid division y Zero problems, I'm not sure if this is needed
+        if(0 in W or 0 in H):
+            iteration = max_iter
             
-        HP = H*(top/bottom)**(e(beta))
+        iteration+=1
 
-        top = ((W.dot(H))**(beta-2)*V).dot(H.transpose())
-        bottom = (W.dot(H)**(beta-1)).dot(H.transpose())+phi * W/repmat(lamb,f,1)
-        W = W*(top/bottom)**(e(beta))
-        H = HP
-
-        tol = -10000
-
-        for i in range(k):
-            r = 0
-            for j in range(f):
-                r+=1/2 * W[j,i]**2
-            for j in range(n):
-                r+=1/2 * H[i,j]**2
-            r+=b
-            r/=c
-
-            tol = max(r,abs((r-lamb[i,0])/lamb[i,0]))
-            lamb[i,0] = r
-        nCount+=1
-
+    #Avoid divide by zero errors elsewhere 
+    W+=EPSILON
+    H+=EPSILON
     return (W,H)
 
         
