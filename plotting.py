@@ -5,6 +5,9 @@ from scipy.optimize import linear_sum_assignment
 
 def cosineTable(a,b,showBest=False):
     """Show Best runs the Hungarian algorithm to determine the best matching"""
+
+
+    print(a[0],b[0])
     
     similarities = [[util.cosineSimilarity(a[i],b[j]) for j in range(len(b))] for i in range(len(a))]
     similarities = np.array(similarities)

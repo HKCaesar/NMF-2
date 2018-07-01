@@ -28,3 +28,9 @@ def hungarian(a,b):
         s+=similarities[row[i]][col[i]]
 
     return s/len(row)                
+
+def addZeros(arr,num):
+    #Add zero rows to end of array
+    for i in range(num):
+        arr = np.append(arr,np.array([0 for i in range(arr.shape[1])]),axis=0)
+    return arr

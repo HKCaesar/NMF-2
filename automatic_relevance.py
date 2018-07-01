@@ -44,34 +44,40 @@ def repmat(lamb,a,n):
 
     return mat
 
-def ard(V,k,a,beta,tau,phi):
+def ard(V,k,a,beta,tau,phi,max_iter=300):
+    EPSILON=10**-10
+    INFINITY = 10000000
+    
+    #Defining the dimensions of the matrix
     f = V.shape[0]
     n = V.shape[1]
 
-    W = makeRandom(f,k)
-    H = makeRandom(k,n)
-    lamb = makeRandom(k,1)
+    #Track changes in lambda through time (Lambda is matrix of size k)
+    lambdaList = np.zeros((max_iter,k))
 
-    tol = -100000
-    previousTol = 10
+    #Add small values of epsilon to prevent divide by zero errors
+    V+=EPSILON
 
-    averageV = 1/(f*n) * sum([V.item(i) for i in range(f*n)])
-
-    b = np.pi * (a-1)*averageV/(2*k)
+    meanV = np.sum(V)/(f*n)
+    
+    W = (makeRandom(f,k)+1)*(meanV**.5/k)
+    H = (makeRandom(k,n)+1)*(meanV**.5/k)
+    b = np.pi * (a-1)*meanV/(2*k)
     c = (f+n)/2 + a+1
-
-    for i in range(k):
-        pr = ((1/2 * sum([W[fi,i]**2 for fi in range(f)])
-                     + 1/2 * sum([H[i,ni]**2 for ni in range(n)]))+b)/c
-        lamb[i,0] = pr
+    lamb = (np.sum(W**2,axis=0).T/2 + np.sum(H**2,axis=1)/2 + b)/c
+    lambdaList[0] = lamb
+    tol = INFINITY
 
 
-    while(abs(tol-previousTol)>tau):
+    iteration = 1
+    while(abs(tol-previousTol)>tau and iteration<=max_iter):
+        top = W.T.dot(W.dot(H)**(beta-2)
+        
         previousTol = tol
         top = W.transpose().dot(
             ((W.dot(H))**(beta-2))*V)
 
-        bottom = W.transpose().dot(W.dot(H)**(beta-1))+phi * H/repmat(lamb,1,n)
+        bottom = W.transpose().dot(W.dot(H)**(beta-1)) + phi * H/repmat(lamb,1,n)
 
         HC = deepcopy(H)
         for i in range(k):
@@ -98,6 +104,7 @@ def ard(V,k,a,beta,tau,phi):
 
             tol = max(r,abs((r-lamb[i,0])/lamb[i,0]))
             lamb[i,0] = r
+        nCount+=1
 
     return (W,H)
 
