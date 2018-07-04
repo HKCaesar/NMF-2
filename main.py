@@ -8,15 +8,18 @@ import automatic_relevance as ard
 from ardnmf import ARDNMF
 model = ARDNMF(a=0)
 
-V = util.readTSV("data/alexsandrov/breast.txt").T
+"""V = util.readTSV("data/alexsandrov/breast.txt").T
 
 with open("data/alexsandrov/signatures.txt") as f:
     actualW = f.read().split("\n")[1:]
     for i in range(len(actualW)):
         actualW[i] = list(map(float,actualW[i].split("\t")[3:]))
-    actualW = np.array(actualW).T
+    actualW = np.array(actualW).T"""
 
-k = 27
+V = util.readTSV("data/classdata/mutation-counts.tsv")
+actualW = np.load("data/classdata/example-signatures.npy")
+    
+k = 5
 H = model.fit_transform(V)
 W = model.components_
 
