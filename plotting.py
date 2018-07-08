@@ -43,8 +43,13 @@ def kasarBar(H):
     mutations = mutations.split("\t")[1:]
 
     kasarOrder = "T>C T>G T>A C>A C>G C>T".split(" ")
-
-    mutations = sorted(mutations,key=lambda x: kasarOrder.index(x.split("[")[1].split("]")[0]))
+    lexOrder = []
+    for i in 'ACTG':
+        for j in 'ACTG':
+            lexOrder.append(i+j)
+    lexOrder = sorted(lexOrder)
+    print(lexOrder)
+    mutations = sorted(mutations,key=lambda x: kasarOrder.index(x.split("[")[1].split("]")[0]) + lexOrder.index(x[0]+x[-1])/100)
 
     numRows = len(H)*100+11
 

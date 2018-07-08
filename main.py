@@ -18,10 +18,16 @@ with open("data/alexsandrov/signatures.txt") as f:
 
 beta = 1
 
-V = util.readTSV("data/kasar/far.tsv")
+V = util.readTSV("data/kasar/combined.tsv")
 V = np.add(V,.000001)
+
 
 k=3
 W,H = ard.ard(V,k,0,beta,10**(-5),1,max_iter=300)
+
+for l in range(10):
+    WP,HP = ard.ard(V,k,0,beta,10**(-5),1,max_iter=300)
+    if(ard.D(beta,V,W.dot(H))>ard.D(beta,V,WP.dot(HP))):
+        W,H = WP, HP
     
 plotting.kasarBar(H)
