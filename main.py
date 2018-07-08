@@ -16,18 +16,12 @@ with open("data/alexsandrov/signatures.txt") as f:
         actualW[i] = list(map(float,actualW[i].split("\t")[3:]))
     actualW = np.array(actualW).T"""
 
-V = util.readTSV("data/classdata/mutation-counts.tsv")
-actualW = np.load("data/classdata/example-signatures.npy")
+beta = 1
+
+V = util.readTSV("data/kasar/far.tsv")
+V = np.add(V,.000001)
+
+k=3
+W,H = ard.ard(V,k,0,beta,10**(-5),1,max_iter=300)
     
-k = 5
-H = model.fit_transform(V)
-W = model.components_
-
-
-W,H = ard.ard(V,k,0,1,10**(-5),1,max_iter=300)
-H = util.addZeros(H,actualW.shape[0]-H.shape[0])
-actualW = util.addZeros(actualW,H.shape[0]-actualW.shape[0])
-
-score = plotting.cosineTable(H,actualW,showBest=True)
-print(score)
-plt.show()
+plotting.kasarBar(H)
