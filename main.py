@@ -23,7 +23,7 @@ V = np.add(V,.000001)
 
 
 k=3
-W,H = ard.ard(V,k,0,beta,10**(-5),1,max_iter=300)
+W,H = ard.ard(V,k,0,beta,10**(-5),1,max_iter=300,ltype="l1")
 
 for l in range(10):
     WP,HP = ard.ard(V,k,0,beta,10**(-5),1,max_iter=300)
