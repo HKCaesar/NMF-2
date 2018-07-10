@@ -50,11 +50,11 @@ def ard(V,k,a,beta,tau,phi,max_iter=300,ltype="l2"):
     W = (makeRandom(f,k)+1)*(meanV**.5/k)
     H = (makeRandom(k,n)+1)*(meanV**.5/k)
     b = np.pi * (a-1)*meanV/(2*k)
-    c = 0
-    if(ltype=="l1"):
-        c=f+n+a+1
-    else:
+
+    c = f+n+a+1
+    if(ltype=="l2"):
         c = (f+n)/2 + a+1
+        
     lamb = (np.sum(W**2,axis=0).T/2 + np.sum(H**2,axis=1)/2 + b)/c
     lambdaList[0] = lamb
     tol = INFINITY
@@ -68,10 +68,10 @@ def ard(V,k,a,beta,tau,phi,max_iter=300,ltype="l2"):
         #Update H
         top = W.T.dot((W.dot(H)**(beta-2)) * V)
         bottom = W.T.dot(W.dot(H)**(beta-1))
-        if(ltype=="l2"):
-            bottom+=phi*H/np.tile(np.array([lamb]).T,(1,n))
-        else:
+        if(ltype=="l1"):
             bottom+=phi/np.tile(np.array([lamb]).T,(1,n))
+        elif(ltype=="l2"):
+            bottom+=phi*H/np.tile(np.array([lamb]).T,(1,n))
         
         allElements=H>0
         #Checking for NaN
@@ -82,11 +82,13 @@ def ard(V,k,a,beta,tau,phi,max_iter=300,ltype="l2"):
         #Update W
         top = (W.dot(H)**(beta-2)*V).dot(H.T)
         bottom = (W.dot(H)**(beta-1)).dot(H.T)
-        if(ltype=="l2"):
-            bottom+=phi*W/np.tile(np.array([lamb]),(f,1))
-        else:
+        if(ltype=="l1"):
             bottom+=phi/np.tile(np.array([lamb]),(f,1))
+        elif(ltype=="l2"):
+            bottom+=phi*W/np.tile(np.array([lamb]),(f,1))
+
         allElements=W>0
+        #Checking for NaN
         if(((top/bottom)[0,0]**(expfunc(beta)))!=((top/bottom)**(expfunc(beta)))[0,0]):
             break
         W[allElements] = W[allElements] * ((top/bottom)**expfunc(beta))[allElements]
@@ -99,7 +101,7 @@ def ard(V,k,a,beta,tau,phi,max_iter=300,ltype="l2"):
         previous = lambdaList[iteration-1]
         tol = max((lamb-previous)/previous)
 
-        #To avoid division y Zero problems, I'm not sure if this is needed
+        #To avoid division by Zero problems, I'm not sure if this is needed
         if(0 in W or 0 in H):
             iteration = max_iter
             
