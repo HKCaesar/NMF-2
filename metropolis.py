@@ -21,8 +21,4 @@ def randomSample(f,trials=1000,x=0):
 
     return sampleList[500:][::100]
 
-r = randomSample(lambda x: norm.pdf(x,100,10))
-for i in r:
-    print(i)
-        
     

@@ -2,6 +2,7 @@ from PIL import Image
 import numpy as np
 
 def extractFaces(location):
+    """Extract the faces from the 19x19 image file"""
     faceSize = 19
     
     allFaces = Image.open(location)
@@ -24,9 +25,11 @@ def extractFaces(location):
             imageNumber+=1
 
 def toGrayscale(color):
+    """Convert color tuple to grayscale"""
     return round(color[0]*.21+color[1]*.72+color[2]*.07)
 
 def toArray(location):
+    """Convert image to array of pixels"""
     face = Image.open(location)
     face.load()
     width, height = face.size
@@ -40,6 +43,7 @@ def toArray(location):
     return ar
 
 def writeGrayscale(ar,name):
+    """Write the grayscale array to file with filename 'name'"""
     size = round(len(ar)**.5)
     newAr = np.zeros((size,size,3),dtype=np.uint8)
     
