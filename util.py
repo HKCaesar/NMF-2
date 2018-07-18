@@ -38,3 +38,14 @@ def addZeros(arr,num):
     #Add zero rows to end of array
     arr = np.append(arr,np.zeros((3,arr.shape[1])),axis=0)
     return arr
+
+def dimensionReduction(M):
+    total = np.sum(M)
+
+    useRows = []
+    for i in range(M.shape[0]):
+        if(np.sum(M[i])>=.01*total):
+            useRows.append(i)
+
+    return M[useRows,:]
+        
